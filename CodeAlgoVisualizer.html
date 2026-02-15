@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>codeAlgo · visualizer (BTech project)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: linear-gradient(145deg, #0b1729 0%, #1a2a3f 100%);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .project-container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(18, 28, 40, 0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 45px -10px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+            padding: 2rem 2rem 2.5rem;
+            border: 1px solid rgba(90, 140, 220, 0.2);
+        }
+        /* header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .title-section h1 {
+            font-weight: 600;
+            font-size: 2.2rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(120deg, #bfd9ff, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        .title-section .badge {
+            background: #2563eb30;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #9bbdf0;
+            border: 1px solid #3b6bb0;
+            display: inline-block;
+            margin-top: 0.4rem;
+        }
+        .algo-switch {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .algo-btn {
+            background: #1e2b3c;
+            border: 1px solid #344e6c;
+            color: #b3cef0;
+            padding: 0.6rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .algo-btn.active {
+            background: #2563eb;
+            border-color: #60a5fa;
+            color: white;
+            box-shadow: 0 8px 16px -6px #1e3a8a;
+        }
+        .algo-btn:hover {
+            background: #2d4057;
+            color: white;
+        }
+
+        /* main card : array + tree hybrid playground */
+        .visual-panel {
+            background: #0f1a28;
+            border-radius: 2rem;
+            padding: 2rem 1.5rem;
+            border: 1px solid #2d415a;
+            box-shadow: inset 0 2px 5px #00000030, 0 10px 20px -5px #020617;
+            margin-bottom: 2rem;
+        }
+
+        .canvas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8rem;
+            color: #b0cbff;
+        }
+        .canvas-header h3 {
+            font-weight: 400;
+            font-size: 1.2rem;
+            background: #1f3143;
+            padding: 0.4rem 1.5rem;
+            border-radius: 40px;
+            border: 1px solid #3a5b7c;
+        }
+        .controls-mini {
+            display: flex;
+            gap: 1rem;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #8bb4f0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0 0.3rem;
+            transition: 0.2s;
+        }
+        .icon-btn:hover {
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* array bars + tree container */
+        .visual-area {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+        .bars-container {
+            flex: 2;
+            min-width: 280px;
+            background: #0b121f;
+            border-radius: 2rem;
+            padding: 1.5rem 1rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 0.6rem;
+            height: 280px;
+            box-shadow: inset 0 0 0 1px #24425e;
+        }
+        .bar {
+            background: linear-gradient(to top, #3b82f6, #60a5fa);
+            width: 32px;
+            border-radius: 12px 12px 6px 6px;
+            transition: height 0.25s ease, background 0.2s;
+            box-shadow: 0 -2px 12px #2563eb80;
+            border: 1px solid #90c0ff;
+            border-bottom: none;
+        }
+        .bar.special {
+            background: linear-gradient(to top, #f59e0b, #fbbf24);
+            box-shadow: 0 -2px 15px #f59e0b;
+            border-color: #fde68a;
+        }
+        .tree-container {
+            flex: 1;
+            min-width: 240px;
+            background: #0b121f;
+            border-radius: 2rem;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 0 1px #24425e;
+        }
+        .tree-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .node-value {
+            background: #2c3f5c;
+            color: white;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid #3b82f6;
+            box-shadow: 0 6px 0 #1a2b3f, 0 8px 12px black;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+        .tree-children {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .child {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .child .node-value {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+            background: #1f3a5e;
+            border-color: #f97316;
+        }
+        .edge-label {
+            font-size: 0.8rem;
+            color: #84a9e0;
+            margin-top: 0.2rem;
+        }
+
+        /* statistics + slider */
+        .stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: #132235;
+            padding: 1.2rem 2rem;
+            border-radius: 60px;
+            margin-bottom: 2rem;
+            border: 1px solid #2d5780;
+        }
+        .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 0.6rem;
+            color: #d2e6ff;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .stat-value {
+            font-size: 1.7rem;
+            font-weight: 600;
+            background: #010f1a;
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            letter-spacing: 1px;
+            color: #b9d9ff;
+            border: 1px solid #3b6ca0;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .slider-container span {
+            color: #b3d0fc;
+        }
+        input[type=range] {
+            width: 200px;
+            background: #1e374f;
+            height: 6px;
+            border-radius: 10px;
+            -webkit-appearance: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #90c0ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 8px #3b82f6;
+            border: 2px solid white;
+        }
+
+        /* action buttons */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .primary-btn {
+            background: #1f3f60;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 1rem 2.5rem;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #4882c0;
+            box-shadow: 0 8px 0 #0a1a2a, 0 8px 15px black;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .primary-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #0a1a2a, 0 8px 15px black;
+        }
+        .primary-btn.reset-btn {
+            background: #2d3c4f;
+            border-color: #6d8bb0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #5f7da0;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="project-container">
+        <!-- header -->
+        <div class="header">
+            <div class="title-section">
+                <h1>⚡ codeAlgo · hybrid visualizer</h1>
+                <span class="badge">BTech year 2 · data structure & algorithms</span>
+            </div>
+            <div class="algo-switch">
+                <div class="algo-btn active" data-algo="bubble">bubble sort</div>
+                <div class="algo-btn" data-algo="selection">selection sort</div>
+                <div class="algo-btn" data-algo="bst">binary search tree</div>
+            </div>
+        </div>
+
+        <!-- main visual panel (array + tree) -->
+        <div class="visual-panel">
+            <div class="canvas-header">
+                <h3 id="visual-title">🔍 BUBBLE SORT · real‑time</h3>
+                <div class="controls-mini">
+                    <button class="icon-btn" id="shuffleArrayBtn" title="shuffle array">🔀</button>
+                    <button class="icon-btn" id="addNumberBtn" title="insert random node (BST)">🌱</button>
+                </div>
+            </div>
+            <div class="visual-area">
+                <!-- bar array container -->
+                <div class="bars-container" id="barsContainer"></div>
+                <!-- tree container (binary tree) -->
+                <div class="tree-container" id="treeContainer">
+                    <div class="tree-node" id="bstRoot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- statistics + size control -->
+        <div class="stats-row">
+            <div class="stat-item"><span class="stat-label">steps</span><span class="stat-value" id="stepCounter">0</span></div>
+            <div class="stat-item"><span class="stat-label">array&nbsp;size</span><span class="stat-value" id="arraySize">6</span></div>
+            <div class="slider-container">
+                <span>🔹</span>
+                <input type="range" id="sizeSlider" min="4" max="10" value="6" step="1">
+                <span id="sliderValue">6</span>
+            </div>
+        </div>
+
+        <!-- main action buttons -->
+        <div class="action-bar">
+            <button class="primary-btn" id="runBtn">▶ RUN SORT / TRAVERSE</button>
+            <button class="primary-btn reset-btn" id="resetBtn">⟲ RESET VISUAL</button>
+        </div>
+        <footer>⬤ live structure · bubble / selection sort with step counter · BST random insert</footer>
+    </div>
+
+    <script>
+        (function(){
+            // ---------- state management ----------
+            let currentAlgo = 'bubble';          // 'bubble', 'selection', 'bst'
+            let array = [42, 23, 16, 75, 31, 18]; // default 6 elements
+            let bstRoot = null;                   // simple BST mock (for visualization)
+            let steps = 0;
+            
+            // ---------- DOM elements ----------
+            const barsDiv = document.getElementById('barsContainer');
+            const treeDiv = document.getElementById('bstRoot');
+            const visualTitle = document.getElementById('visual-title');
+            const stepSpan = document.getElementById('stepCounter');
+            const arraySizeSpan = document.getElementById('arraySize');
+            const sizeSlider = document.getElementById('sizeSlider');
+            const sliderValueSpan = document.getElementById('sliderValue');
+            const algoBtns = document.querySelectorAll('.algo-btn');
+            const shuffleBtn = document.getElementById('shuffleArrayBtn');
+            const addNumberBtn = document.getElementById('addNumberBtn');
+            const runBtn = document.getElementById('runBtn');
+            const resetBtn = document.getElementById('resetBtn');
+
+            // ---------- helper: generate random array from size ----------
+            function generateRandomArray(len) {
+                return Array.from({ length: len }, () => Math.floor(Math.random() * 60) + 10); // 10..70
+            }
+
+            // ---------- update entire UI based on current mode & state ----------
+            function refreshUI() {
+                // update size display
+                const size = array.length;
+                arraySizeSpan.textContent = size;
+                sliderValueSpan.textContent = size;
+                
+                // render bars always
+                renderBars(array);
+                
+                // render tree if bst mode, else hide tree container and show bars full width? but we keep both for simplicity
+                if (currentAlgo === 'bst') {
+                    document.querySelector('.tree-container').style.display = 'flex';
+                    renderBST();
+                } else {
+                    document.querySelector('.tree-container').style.display = 'none';
+                }
+                
+                // update step counter
+                stepSpan.textContent = steps;
+            }
+
+            // ---------- render array bars (with optional highlight) ----------
+            function renderBars(arr, highlightIndices = []) {
+                barsDiv.innerHTML = '';
+                const maxVal = Math.max(...arr, 10);
+                arr.forEach((value, idx) => {
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    if (highlightIndices.includes(idx)) bar.classList.add('special');
+                    const height = (value / maxVal) * 200 + 40; // between 40 and 240px
+                    bar.style.height = height + 'px';
+                    bar.setAttribute('data-value', value);
+                    bar.style.background = highlightIndices.includes(idx) 
+                        ? 'linear-gradient(to top, #f97316, #fbbf24)' : '';
+                    barsDiv.appendChild(bar);
+                });
+            }
+
+            // ---------- BST render (very simplified binary tree mock) ----------
+            function renderBST() {
+                if (!bstRoot || bstRoot.size === 0) {
+                    treeDiv.innerHTML = '<div class="node-value" style="opacity:0.6;">∅</div><div style="color:#7fa3cf; font-size:0.9rem;">empty tree</div>';
+                    return;
+                }
+                // simple inline display: root and up to two children (for demo)
+                const rootVal = bstRoot.value;
+                const leftVal = bstRoot.left ? bstRoot.left.value : null;
+                const rightVal = bstRoot.right ? bstRoot.right.value : null;
+                
+                let html = `<div class="node-value">${rootVal}</div>`;
+                html += `<div class="tree-children">`;
+                // left child
+                html += `<div class="child">`;
+                if (leftVal !== null) html += `<div class="node-value">${leftVal}</div><span class="edge-label">L</span>`;
+                else html += `<div class="node-value" style="background:#1b2b3f; border-color:#3b5d86;">—</div>`;
+                html += `</div>`;
+                // right child
+                html += `<div class="child">`;
+                if (rightVal !== null) html += `<div class="node-value">${rightVal}</div><span class="edge-label">R</span>`;
+                else html += `<div class="node-value" style="background:#1b2b3f; border-color:#3b5d86;">—</div>`;
+                html += `</div>`;
+                html += `</div>`;
+                treeDiv.innerHTML = html;
+            }
+
+            // ---------- BST node structure (simple) ----------
+            class BSTNode {
+                constructor(val) {
+                    this.value = val;
+                    this.left = null;
+                    this.right = null;
+                }
+            }
+            function bstInsert(root, val) {
+                if (!root) return new BSTNode(val);
+                if (val < root.value) root.left = bstInsert(root.left, val);
+                else if (val > root.value) root.right = bstInsert(root.right, val);
+                return root;
+            }
+            function bstReset() {
+                bstRoot = null;
+            }
+            function bstRandomInsert() {
+                const val = Math.floor(Math.random() * 50) + 10; // 10..60
+                bstRoot = bstInsert(bstRoot, val);
+                steps++;
+                refreshUI();
+            }
+
+            // ---------- sorting simulation (bubble / selection) incremental one step per run ----------
+            let sortStepIndex = 0;
+            let sorted = false;
+
+            function resetSortState() {
+                sortStepIndex = 0;
+                sorted = false;
+            }
+
+            // perform one step of bubble sort (next comparison/swap)
+            function stepBubble() {
+                const n = array.length;
+                if (n <= 1) return false;
+                let swapped = false;
+                // one pass from start to (n-1 - passIndex) – we simulate incremental pass.
+                // we'll use a simple approach: one swap per step (like a bubble sort step)
+                for (let i = 0; i < n-1; i++) {
+                    if (array[i] > array[i+1]) {
+                        // swap
+                        [array[i], array[i+1]] = [array[i+1], array[i]];
+                        steps++;
+                        // highlight swapped indices
+                        renderBars(array, [i, i+1]);
+                        return true;
+                    }
+                }
+                // if no swap was done, array is fully sorted.
+                return false; // no more swaps
+            }
+
+            // selection sort step: find minimum from sortStepIndex to end, then swap.
+            function stepSelection() {
+                const n = array.length;
+                if (sortStepIndex >= n-1) return false; // finished
+                
+                let minIdx = sortStepIndex;
+                for (let j = sortStepIndex + 1; j < n; j++) {
+                    if (array[j] < array[minIdx]) minIdx = j;
+                }
+                if (minIdx !== sortStepIndex) {
+                    [array[sortStepIndex], array[minIdx]] = [array[minIdx], array[sortStepIndex]];
+                }
+                steps++;
+                // highlight the two swapped elements
+                renderBars(array, [sortStepIndex, minIdx]);
+                sortStepIndex++;
+                return true;
+            }
+
+            // reset array and steps from slider/generation
+            function resetArrayAndSteps() {
+                const newSize = parseInt(sizeSlider.value, 10);
+                array = generateRandomArray(newSize);
+                steps = 0;
+                sorted = false;
+                sortStepIndex = 0;
+                bstReset();            // reset BST as well for cleanliness
+                refreshUI();
+            }
+
+            // handle run click: depends on currentAlgo
+            function handleRun() {
+                if (currentAlgo === 'bubble') {
+                    let progress = stepBubble();
+                    if (!progress) { // array sorted
+                        renderBars(array, []);
+                    } else {
+                        // step already rendered inside stepBubble
+                    }
+                } 
+                else if (currentAlgo === 'selection') {
+                    let progress = stepSelection();
+                    if (!progress) {
+                        renderBars(array, []);
+                    }
+                } 
+                else if (currentAlgo === 'bst') {
+                    // BST: perform in-order traversal mock? we simply insert a random node for demo.
+                    bstRandomInsert();
+                }
+                // update step counter (already updated inside functions, but refresh ui)
+                stepSpan.textContent = steps;
+                // for array modes, also ensure bars current (step functions call renderBars)
+                if (currentAlgo !== 'bst') refreshUI(); 
+                else renderBST();
+            }
+
+            // reset everything
+            function fullReset() {
+                const size = parseInt(sizeSlider.value, 10);
+                array = generateRandomArray(size);
+                steps = 0;
+                sortStepIndex = 0;
+                sorted = false;
+                bstReset();
+                // if current algo is BST, maybe insert 1-2 nodes to not show empty? add two default
+                if (currentAlgo === 'bst') {
+                    bstRoot = bstInsert(null, 42);
+                    bstRoot = bstInsert(bstRoot, 23);
+                    bstRoot = bstInsert(bstRoot, 67);
+                    steps = 3; // because inserted three
+                }
+                refreshUI();
+            }
+
+            // change algorithm
+            function setActiveAlgo(algo) {
+                currentAlgo = algo;
+                algoBtns.forEach(btn => {
+                    if (btn.dataset.algo === algo) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                });
+                // update title
+                if (algo === 'bubble') visualTitle.textContent = '🔍 BUBBLE SORT · real‑time';
+                else if (algo === 'selection') visualTitle.textContent = '🔍 SELECTION SORT · stepwise';
+                else visualTitle.textContent = '🌳 BINARY SEARCH TREE (BST) · random insert';
+                
+                // reset steps and array consistent with mode
+                if (algo === 'bst') {
+                    bstReset();
+                    bstRoot = bstInsert(null, 42);
+                    bstRoot = bstInsert(bstRoot, 23);
+                    bstRoot = bstInsert(bstRoot, 67);
+                    steps = 3;
+                } else {
+                    // array mode: ensure array exists
+                    const size = parseInt(sizeSlider.value, 10);
+                    array = generateRandomArray(size);
+                    steps = 0;
+                    sortStepIndex = 0;
+                    bstReset();
+                }
+                refreshUI();
+            }
+
+            // event listeners
+            algoBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const algo = e.target.dataset.algo;
+                    setActiveAlgo(algo);
+                });
+            });
+
+            sizeSlider.addEventListener('input', (e) => {
+                const val = e.target.value;
+                sliderValueSpan.textContent = val;
+                // only regenerate if not in BST? we allow but will reset
+                if (currentAlgo !== 'bst') {
+                    array = generateRandomArray(parseInt(val, 10));
+                    steps = 0;
+                    sortStepIndex = 0;
+                } else {
+                    // for bst, we also maybe resize but simpler: change nothing, or reset BST?
+                    // let's reset BST with new size irrelevant – keep but reinitialize
+                    bstReset();
+                    bstRoot = bstInsert(null, 42);
+                    bstRoot = bstInsert(bstRoot, 23);
+                    bstRoot = bstInsert(bstRoot, 67);
+                    steps = 3;
+                }
+                refreshUI();
+            });
+
+            shuffleBtn.addEventListener('click', () => {
+                if (currentAlgo !== 'bst') {
+                    array = generateRandomArray(array.length);
+                    steps = 0;
+                    sortStepIndex = 0;
+                } else {
+                    // bst shuffle: randomize tree
+                    bstReset();
+                    bstRoot = bstInsert(null, Math.floor(Math.random() * 40 + 20));
+                    bstRoot = bstInsert(bstRoot, Math.floor(Math.random() * 40 + 20));
+                    bstRoot = bstInsert(bstRoot, Math.floor(Math.random() * 40 + 20));
+                    steps = 3;
+                }
+                refreshUI();
+            });
+
+            addNumberBtn.addEventListener('click', () => {
+                if (currentAlgo === 'bst') {
+                    bstRandomInsert();
+                } else {
+                    // for array modes: push random element (increase size)
+                    if (array.length < 12) {
+                        array.push(Math.floor(Math.random() * 60) + 10);
+                        steps = 0;
+                        sortStepIndex = 0;
+                        // update slider value to match new length
+                        sizeSlider.value = array.length;
+                        sliderValueSpan.textContent = array.length;
+                    } else {
+                        alert('max 12 elements for clarity');
+                    }
+                    refreshUI();
+                }
+            });
+
+            runBtn.addEventListener('click', handleRun);
+            resetBtn.addEventListener('click', fullReset);
+
+            // initialization
+            (function init() {
+                // default bubble mode
+                setActiveAlgo('bubble');
+                array = generateRandomArray(6);
+                steps = 0;
+                bstReset();
+                // but we still want bst to have some default if later switched
+                bstRoot = bstInsert(null, 42);
+                bstRoot = bstInsert(bstRoot, 23);
+                bstRoot = bstInsert(bstRoot, 67);
+                refreshUI();
+            })();
+
+        })();
+    </script>
+</body>
+</html>
